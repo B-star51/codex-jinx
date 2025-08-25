@@ -1,4 +1,4 @@
-// 🧠 Cybersecurity Quotes
+// 🧠 Quotes
 const quotes = [
   "“Hackers are artists of logic.”",
   "“Security is not a product, it’s a process.”",
@@ -18,7 +18,7 @@ function showRandomQuote() {
   quoteBox.textContent = random;
 }
 
-// 🧬 Matrix Animation
+// 🧬 Matrix
 const canvas = document.getElementById('matrix');
 const ctx = canvas.getContext('2d');
 canvas.height = window.innerHeight;
@@ -47,51 +47,62 @@ function drawMatrix() {
 
 setInterval(drawMatrix, 50);
 
-// 🧭 Transition to Dashboard
+// 🧭 Transition
 setTimeout(() => {
   document.getElementById('intro').classList.add('hidden');
   document.getElementById('dashboard').classList.remove('hidden');
   canvas.style.display = 'none';
-}, 4000); // Extended to 4 seconds
+}, 4000);
 
-// 🧠 Show Random Quote on Load
 showRandomQuote();
-setInterval(showRandomQuote, 5000); // Rotate every 5 seconds
+setInterval(showRandomQuote, 5000);
 
-// 📁 File Structure
-const fileStructure = {
-  "Network": ["nmap.md", "wireshark.md"],
-  "Web": ["burpsuite.md", "sqlmap.md"],
-  "OSINT": ["recon-ng.md", "theHarvester.md"]
+// 📁 File System
+let folders = {
+  "Network": ["Nmap"],
+  "Web": ["BurpSuite"],
+  "OSINT": ["Recon-ng"]
 };
 
-// 📁 Build Sidebar
+let currentNote = "";
+
 function buildSidebar() {
-  const sidebar = document.querySelector("aside ul");
+  const sidebar = document.getElementById("sidebar");
   sidebar.innerHTML = "";
 
-  for (const [folder, files] of Object.entries(fileStructure)) {
+  for (const [folder, files] of Object.entries(folders)) {
     const folderItem = document.createElement("li");
     folderItem.textContent = `📁 ${folder}`;
     sidebar.appendChild(folderItem);
 
     files.forEach(file => {
       const noteItem = document.createElement("li");
-      noteItem.textContent = `   └── 📄 ${file.replace(".md", "")}`;
-      noteItem.onclick = () => loadNote(`notes/${folder.toLowerCase()}/${file}`);
+      noteItem.textContent = `   └── 📄 ${file}`;
+      noteItem.onclick = () => loadNote(folder, file);
       sidebar.appendChild(noteItem);
     });
   }
 }
 
-buildSidebar();
-
-// 📄 Load Markdown Note
-function loadNote(path) {
-  fetch(path)
-    .then(res => res.text())
-    .then(text => {
-      document.getElementById('note-viewer').innerText = text;
-    });
+function addFolder() {
+  const name = prompt("Enter folder name:");
+  if (name && !folders[name]) {
+    folders[name] = [];
+    buildSidebar();
+  }
 }
 
+function saveNote() {
+  if (!currentNote) return;
+  const content = document.getElementById("editor").value;
+  localStorage.setItem(currentNote, content);
+  alert("Note saved!");
+}
+
+function loadNote(folder, file) {
+  currentNote = `${folder}/${file}`;
+  const content = localStorage.getItem(currentNote) || "";
+  document.getElementById("editor").value = content;
+}
+
+buildSidebar();
