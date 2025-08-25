@@ -52,18 +52,20 @@ setTimeout(() => {
   document.getElementById('intro').classList.add('hidden');
   document.getElementById('dashboard').classList.remove('hidden');
   canvas.style.display = 'none';
-}, 3000);
+}, 4000); // Extended to 4 seconds
 
 // 🧠 Show Random Quote on Load
 showRandomQuote();
+setInterval(showRandomQuote, 5000); // Rotate every 5 seconds
 
-// 📁 Dynamic Sidebar Builder
+// 📁 File Structure
 const fileStructure = {
   "Network": ["nmap.md", "wireshark.md"],
   "Web": ["burpsuite.md", "sqlmap.md"],
   "OSINT": ["recon-ng.md", "theHarvester.md"]
 };
 
+// 📁 Build Sidebar
 function buildSidebar() {
   const sidebar = document.querySelector("aside ul");
   sidebar.innerHTML = "";
