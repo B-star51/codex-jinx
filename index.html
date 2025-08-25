@@ -3,52 +3,53 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cybersecurity Playbook Editor</title>
+  <title>Codex Jinx — Cyber Playbook</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header class="app-header">
+  <header>
     <div class="logo">
-      <!-- Random symbol logo -->
-      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M12 2L15 8H9L12 2Z" fill="#00ffd5"/>
-        <circle cx="12" cy="14" r="4" stroke="#7b2cff" stroke-width="2"/>
-      </svg>
-      <span>Cyber Playbook</span>
+      <span id="logoSymbol"></span> Codex Jinx — Cyber Playbook
     </div>
-    <div class="header-actions">
-      <button class="btn" id="addFileBtn">Add File</button>
-      <button class="btn" id="addFolderBtn">Add Folder</button>
-      <label class="btn btn-file">
-        Upload
-        <input type="file" id="uploadInput" multiple>
-      </label>
-      <button class="btn primary" id="saveBtn">Save</button>
+    <div class="toolbar">
+      <button id="newFolderBtn" class="btn">New Folder</button>
+      <button id="newFileBtn" class="btn">New File</button>
+      <input id="fileInput" type="file" hidden>
+      <button id="uploadBtn" class="btn">Upload File</button>
+      <input id="importWorkspaceInput" type="file" accept="application/json" hidden>
+      <button id="importBtn" class="btn">Import Workspace</button>
+      <button id="exportWorkspaceBtn" class="btn">Export Workspace</button>
+      <button id="saveBtn" class="btn">Save</button>
+      <button id="downloadBtn" class="btn">Download</button>
+      <button id="renameBtn" class="btn">Rename</button>
+      <button id="deleteBtn" class="btn">Delete</button>
     </div>
   </header>
 
-  <div class="layout">
-    <aside class="sidebar">
-      <div class="sidebar-top">
-        <input type="text" class="search" placeholder="Search files...">
-      </div>
-      <ul class="tree" id="fileTree"></ul>
+  <main>
+    <aside id="sidebar">
+      <input id="searchInput" type="text" placeholder="Search files...">
+      <ul id="tree"></ul>
     </aside>
-
-    <div class="editor-pane">
-      <div class="editor-bar">
-        <span class="path" id="currentPath">No file selected</span>
+    <section id="workspace">
+      <div id="currentPath">/ (no file selected)</div>
+      <input id="titleInput" type="text" placeholder="Title">
+      <input id="tagsInput" type="text" placeholder="Tags (comma-separated)">
+      <textarea id="editor" placeholder="Start typing your notes..."></textarea>
+      <div class="urls">
+        <input id="urlInput" type="url" placeholder="Add URL">
+        <button id="addUrlBtn" class="btn">Add URL</button>
+        <ul id="urlList"></ul>
       </div>
-      <textarea id="editor" placeholder="Start writing your cybersecurity notes..."></textarea>
-    </div>
-  </div>
+      <div id="status"></div>
+    </section>
+  </main>
 
-  <footer class="app-footer">
-    Cybersecurity Playbook Editor - Data saved locally
-  </footer>
-
-  <!-- Hidden inputs for folder upload -->
-  <input type="file" id="folderInput" style="display:none;" webkitdirectory directory multiple>
   <script src="script.js"></script>
+  <script>
+    // Random symbol for logo
+    const symbols = ['☣️','⚡','🛡️','🐉','🔮','🕵️','💻','☠️','🧩'];
+    document.getElementById('logoSymbol').textContent = symbols[Math.floor(Math.random()*symbols.length)];
+  </script>
 </body>
 </html>
