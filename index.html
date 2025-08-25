@@ -3,53 +3,50 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Codex Jinx — Cyber Playbook</title>
+  <title>Codex Jinx — Cyber Playbook Workspace</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header>
-    <div class="logo">
-      <span id="logoSymbol"></span> Codex Jinx — Cyber Playbook
+    <h1>Codex Jinx — Cyber Playbook</h1>
+    <div id="toolbar">
+      <button id="newFolderBtn">New Folder</button>
+      <button id="newFileBtn">New File</button>
+      <input type="file" id="fileInput" style="display:none" />
+      <button onclick="document.getElementById('fileInput').click()">Upload File</button>
+      <input type="file" id="importWorkspaceInput" style="display:none" />
+      <button onclick="document.getElementById('importWorkspaceInput').click()">Import Workspace</button>
+      <button id="exportWorkspaceBtn">Export Workspace</button>
+      <button id="renameBtn">Rename</button>
+      <button id="deleteBtn">Delete</button>
+      <button id="saveBtn">Save</button>
+      <button id="downloadBtn">Download</button>
     </div>
-    <div class="toolbar">
-      <button id="newFolderBtn" class="btn">New Folder</button>
-      <button id="newFileBtn" class="btn">New File</button>
-      <input id="fileInput" type="file" hidden>
-      <button id="uploadBtn" class="btn">Upload File</button>
-      <input id="importWorkspaceInput" type="file" accept="application/json" hidden>
-      <button id="importBtn" class="btn">Import Workspace</button>
-      <button id="exportWorkspaceBtn" class="btn">Export Workspace</button>
-      <button id="saveBtn" class="btn">Save</button>
-      <button id="downloadBtn" class="btn">Download</button>
-      <button id="renameBtn" class="btn">Rename</button>
-      <button id="deleteBtn" class="btn">Delete</button>
-    </div>
+    <input id="searchInput" placeholder="Search..." />
   </header>
 
   <main>
     <aside id="sidebar">
-      <input id="searchInput" type="text" placeholder="Search files...">
       <ul id="tree"></ul>
     </aside>
     <section id="workspace">
-      <div id="currentPath">/ (no file selected)</div>
-      <input id="titleInput" type="text" placeholder="Title">
-      <input id="tagsInput" type="text" placeholder="Tags (comma-separated)">
-      <textarea id="editor" placeholder="Start typing your notes..."></textarea>
-      <div class="urls">
-        <input id="urlInput" type="url" placeholder="Add URL">
-        <button id="addUrlBtn" class="btn">Add URL</button>
+      <div id="currentPath"></div>
+      <input id="titleInput" placeholder="Title" />
+      <input id="tagsInput" placeholder="Tags (comma separated)" />
+      <textarea id="editor" placeholder="Start typing..."></textarea>
+      <div id="urlManager">
+        <input id="urlInput" placeholder="Add URL" />
+        <button id="addUrlBtn">Add URL</button>
         <ul id="urlList"></ul>
       </div>
-      <div id="status"></div>
     </section>
   </main>
 
+  <footer>
+    <div id="status">Ready</div>
+  </footer>
+
   <script src="script.js"></script>
-  <script>
-    // Random symbol for logo
-    const symbols = ['☣️','⚡','🛡️','🐉','🔮','🕵️','💻','☠️','🧩'];
-    document.getElementById('logoSymbol').textContent = symbols[Math.floor(Math.random()*symbols.length)];
-  </script>
 </body>
 </html>
+
