@@ -3,50 +3,52 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Codex Jinx — Cyber Playbook Workspace</title>
+  <title>Cybersecurity Playbook Editor</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header>
-    <h1>Codex Jinx — Cyber Playbook</h1>
-    <div id="toolbar">
-      <button id="newFolderBtn">New Folder</button>
-      <button id="newFileBtn">New File</button>
-      <input type="file" id="fileInput" style="display:none" />
-      <button onclick="document.getElementById('fileInput').click()">Upload File</button>
-      <input type="file" id="importWorkspaceInput" style="display:none" />
-      <button onclick="document.getElementById('importWorkspaceInput').click()">Import Workspace</button>
-      <button id="exportWorkspaceBtn">Export Workspace</button>
-      <button id="renameBtn">Rename</button>
-      <button id="deleteBtn">Delete</button>
-      <button id="saveBtn">Save</button>
-      <button id="downloadBtn">Download</button>
+  <header class="app-header">
+    <div class="logo">
+      <!-- Random symbol logo -->
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2L15 8H9L12 2Z" fill="#00ffd5"/>
+        <circle cx="12" cy="14" r="4" stroke="#7b2cff" stroke-width="2"/>
+      </svg>
+      <span>Cyber Playbook</span>
     </div>
-    <input id="searchInput" placeholder="Search..." />
+    <div class="header-actions">
+      <button class="btn" id="addFileBtn">Add File</button>
+      <button class="btn" id="addFolderBtn">Add Folder</button>
+      <label class="btn btn-file">
+        Upload
+        <input type="file" id="uploadInput" multiple>
+      </label>
+      <button class="btn primary" id="saveBtn">Save</button>
+    </div>
   </header>
 
-  <main>
-    <aside id="sidebar">
-      <ul id="tree"></ul>
-    </aside>
-    <section id="workspace">
-      <div id="currentPath"></div>
-      <input id="titleInput" placeholder="Title" />
-      <input id="tagsInput" placeholder="Tags (comma separated)" />
-      <textarea id="editor" placeholder="Start typing..."></textarea>
-      <div id="urlManager">
-        <input id="urlInput" placeholder="Add URL" />
-        <button id="addUrlBtn">Add URL</button>
-        <ul id="urlList"></ul>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="sidebar-top">
+        <input type="text" class="search" placeholder="Search files...">
       </div>
-    </section>
-  </main>
+      <ul class="tree" id="fileTree"></ul>
+    </aside>
 
-  <footer>
-    <div id="status">Ready</div>
+    <div class="editor-pane">
+      <div class="editor-bar">
+        <span class="path" id="currentPath">No file selected</span>
+      </div>
+      <textarea id="editor" placeholder="Start writing your cybersecurity notes..."></textarea>
+    </div>
+  </div>
+
+  <footer class="app-footer">
+    Cybersecurity Playbook Editor - Data saved locally
   </footer>
 
+  <!-- Hidden inputs for folder upload -->
+  <input type="file" id="folderInput" style="display:none;" webkitdirectory directory multiple>
   <script src="script.js"></script>
 </body>
 </html>
-
