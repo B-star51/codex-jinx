@@ -22,13 +22,14 @@
     </header>
 
     <aside>
-      <ul></ul>
+      <button onclick="addFolder()">+ Add Folder</button>
+      <ul id="sidebar"></ul>
     </aside>
 
-    <main id="note-viewer">
-      <p>Select a note to begin.</p>
+    <main>
+      <textarea id="editor" placeholder="Write your notes here..."></textarea>
+      <button onclick="saveNote()">💾 Save Note</button>
     </main>
   </div>
 </body>
 </html>
-
