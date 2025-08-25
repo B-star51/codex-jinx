@@ -1,108 +1,402 @@
-// 🧠 Quotes
-const quotes = [
-  "“Hackers are artists of logic.”",
-  "“Security is not a product, it’s a process.”",
-  "“The best defense is knowing your offense.”",
-  "“Every system has a weakness — find it.”",
-  "“Obscurity is not security.”",
-  "“Tools don’t hack. Hackers do.”",
-  "“Recon is the soul of the breach.”",
-  "“The quieter you become, the more you are able to hear.”",
-  "“Firewalls don’t stop curiosity.”",
-  "“A good hacker knows when not to hack.”"
-];
+// ====== Codex Jinx — Cyber Playbook Workspace ======
+// Structure persisted to localStorage:
+// { id, type:'folder'|'file', name, children?, content?, title?, tags?, urls?:string[] }
+(function(){
+  const STORAGE_KEY = 'codexJinxWorkspace';
+  const ACTIVE_KEY  = 'codexJinxActiveId';
 
-function showRandomQuote() {
-  const quoteBox = document.querySelector(".quote");
-  const random = quotes[Math.floor(Math.random() * quotes.length)];
-  quoteBox.textContent = random;
-}
+  // DOM
+  const treeEl = document.getElementById('tree');
+  const editorEl = document.getElementById('editor');
+  const pathEl = document.getElementById('currentPath');
+  const statusEl = document.getElementById('status');
+  const titleInput = document.getElementById('titleInput');
+  const tagsInput = document.getElementById('tagsInput');
+  const urlInput = document.getElementById('urlInput');
+  const urlList = document.getElementById('urlList');
 
-// 🧬 Matrix
-const canvas = document.getElementById('matrix');
-const ctx = canvas.getContext('2d');
-canvas.height = window.innerHeight;
-canvas.width = window.innerWidth;
+  // Buttons & inputs
+  const newFolderBtn = document.getElementById('newFolderBtn');
+  const newFileBtn = document.getElementById('newFileBtn');
+  const fileInput = document.getElementById('fileInput');
+  const importWorkspaceInput = document.getElementById('importWorkspaceInput');
+  const exportWorkspaceBtn = document.getElementById('exportWorkspaceBtn');
+  const renameBtn = document.getElementById('renameBtn');
+  const deleteBtn = document.getElementById('deleteBtn');
+  const saveBtn = document.getElementById('saveBtn');
+  const downloadBtn = document.getElementById('downloadBtn');
+  const addUrlBtn = document.getElementById('addUrlBtn');
+  const searchInput = document.getElementById('searchInput');
+  const sidebar = document.getElementById('sidebar');
 
-const chars = "01#@$%&*";
-const fontSize = 14;
-const columns = canvas.width / fontSize;
-const drops = Array(Math.floor(columns)).fill(1);
+  // Workspace state
+  let workspace = loadWorkspace() || createDefaultWorkspace();
+  let activeId = localStorage.getItem(ACTIVE_KEY) || null;
 
-function drawMatrix() {
-  ctx.fillStyle = "rgba(10, 31, 68, 0.05)";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-  ctx.fillStyle = "#00ffff";
-  ctx.font = fontSize + "px monospace";
-
-  for (let i = 0; i < drops.length; i++) {
-    const text = chars[Math.floor(Math.random() * chars.length)];
-    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-    drops[i]++;
-    if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-      drops[i] = 0;
-    }
+  // ===== Utilities =====
+  function uid(){ return 'id_' + Math.random().toString(36).slice(2,10) }
+  function now(){ return new Date().toLocaleString() }
+  function saveWorkspace(){
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(workspace));
+    setStatus('Saved workspace');
   }
-}
+  function loadWorkspace(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : null;
+    }catch(e){ console.warn(e); return null; }
+  }
+  function createDefaultWorkspace(){
+    return {
+      id: uid(),
+      type: 'folder',
+      name: 'Playbook',
+      children: [
+        { id: uid(), type: 'folder', name: 'Recon', children: [] },
+        { id: uid(), type: 'folder', name: 'Exploitation', children: [] },
+        { id: uid(), type: 'file', name: 'README.md', title: 'Codex Jinx', tags: 'intro,playbook',
+          content: `# Codex Jinx — Cyber Playbook
 
-setInterval(drawMatrix, 50);
+Welcome! Start building your playbook.
 
-// 🧭 Transition
-setTimeout(() => {
-  document.getElementById('intro').classList.add('hidden');
-  document.getElementById('dashboard').classList.remove('hidden');
-  canvas.style.display = 'none';
-}, 4000);
+## Suggested Sections
+- Recon
+- Enumeration
+- Exploitation
+- PrivEsc
+- Post-Ex
+- Notes & Findings
 
-showRandomQuote();
-setInterval(showRandomQuote, 5000);
+> Tip: Use the toolbar for quick snippets. Add URLs below.
 
-// 📁 File System
-let folders = {
-  "Network": ["Nmap"],
-  "Web": ["BurpSuite"],
-  "OSINT": ["Recon-ng"]
-};
+`
+        }
+      ]
+    };
+  }
+  function findById(node, id){
+    if(!node) return null;
+    if(node.id === id) return node;
+    if(node.type === 'folder'){
+      for(const child of node.children){
+        const found = findById(child, id);
+        if(found) return found;
+      }
+    }
+    return null;
+  }
+  function findParent(root, targetId, parent=null){
+    if(root.id === targetId) return parent;
+    if(root.type === 'folder'){
+      for(const c of root.children){
+        const res = findParent(c, targetId, root);
+        if(res) return res;
+      }
+    }
+    return null;
+  }
+  function pathOf(id){
+    const parts = [];
+    function dfs(node, trail){
+      const t = [...trail, node.name];
+      if(node.id === id){ parts.push(t); return true; }
+      if(node.type === 'folder'){
+        for(const c of node.children){
+          if(dfs(c, t)) return true;
+        }
+      }
+      return false;
+    }
+    dfs(workspace, []);
+    const p = parts[0] || [workspace.name];
+    return '/' + p.join('/');
+  }
+  function setStatus(msg){ statusEl.textContent = msg + ' • ' + now() }
 
-let currentNote = "";
+  // ===== Tree rendering =====
+  function renderTree(filter=''){
+    treeEl.innerHTML = '';
+    function renderNode(node, ul){
+      const li = document.createElement('li');
+      li.dataset.id = node.id;
+      li.className = (node.id === activeId) ? 'active' : '';
+      const label = document.createElement('div');
+      label.className = 'node-label';
+      label.textContent = node.name;
 
-function buildSidebar() {
-  const sidebar = document.getElementById("sidebar");
-  sidebar.innerHTML = "";
+      const type = document.createElement('div');
+      type.className = 'node-type';
+      type.textContent = node.type === 'folder' ? '📁' : '📄';
 
-  for (const [folder, files] of Object.entries(folders)) {
-    const folderItem = document.createElement("li");
-    folderItem.textContent = `📁 ${folder}`;
-    sidebar.appendChild(folderItem);
+      const actions = document.createElement('div');
+      actions.className = 'node-actions';
+      if(node.type==='folder'){
+        const addBtn = document.createElement('button');
+        addBtn.textContent = '+';
+        addBtn.title = 'Add new file here';
+        addBtn.onclick = (e)=>{ e.stopPropagation(); createFile(node.id) };
+        actions.appendChild(addBtn);
+      }
 
-    files.forEach(file => {
-      const noteItem = document.createElement("li");
-      noteItem.textContent = `   └── 📄 ${file}`;
-      noteItem.onclick = () => loadNote(folder, file);
-      sidebar.appendChild(noteItem);
+      li.appendChild(type);
+      li.appendChild(label);
+      li.appendChild(actions);
+
+      li.onclick = ()=>{
+        activeId = node.id;
+        localStorage.setItem(ACTIVE_KEY, activeId);
+        openNode(node.id);
+        renderTree(searchInput.value.trim());
+      };
+
+      if(!filter || node.name.toLowerCase().includes(filter)){
+        ul.appendChild(li);
+      }
+
+      if(node.type==='folder' && node.children?.length){
+        const sub = document.createElement('ul');
+        sub.style.listStyle='none';
+        sub.style.margin='0 0 0 16px';
+        sub.style.padding='0';
+        for(const c of node.children){
+          renderNode(c, sub);
+        }
+        ul.appendChild(sub);
+      }
+    }
+    renderNode(workspace, treeEl);
+  }
+
+  // ===== Node operations =====
+  function createFolder(parentId){
+    const parent = findById(workspace, parentId) || workspace;
+    if(parent.type !== 'folder') return;
+    parent.children.push({ id: uid(), type: 'folder', name: 'New Folder', children: [] });
+    saveWorkspace(); renderTree(searchInput.value.trim());
+  }
+  function createFile(parentId){
+    const parent = findById(workspace, parentId) || workspace;
+    if(parent.type !== 'folder') return;
+    const file = { id: uid(), type:'file', name:'untitled.txt', title:'', tags:'', content:'', urls:[] };
+    parent.children.push(file);
+    activeId = file.id;
+    localStorage.setItem(ACTIVE_KEY, activeId);
+    saveWorkspace(); renderTree(searchInput.value.trim()); openNode(file.id);
+  }
+  function renameNode(id){
+    const node = findById(workspace, id);
+    if(!node) return;
+    const name = prompt('Rename to:', node.name);
+    if(!name) return;
+    node.name = name.trim();
+    saveWorkspace(); renderTree(searchInput.value.trim()); if(id===activeId) refreshEditor(node);
+  }
+  function deleteNode(id){
+    if(workspace.id === id) return alert('Cannot delete root');
+    const parent = findParent(workspace, id);
+    if(!parent) return;
+    if(!confirm('Delete this item?')) return;
+    parent.children = parent.children.filter(c=>c.id!==id);
+    if(activeId === id){ activeId = null; localStorage.removeItem(ACTIVE_KEY); clearEditor(); }
+    saveWorkspace(); renderTree(searchInput.value.trim());
+  }
+
+  // ===== Editor handling =====
+  function openNode(id){
+    const node = findById(workspace, id);
+    if(!node) return;
+    if(node.type === 'folder'){
+      pathEl.textContent = pathOf(node.id) + ' (folder)';
+      clearEditor(true);
+      return;
+    }
+    refreshEditor(node);
+  }
+  function refreshEditor(file){
+    pathEl.textContent = pathOf(file.id);
+    editorEl.value = file.content || '';
+    titleInput.value = file.title || '';
+    tagsInput.value = file.tags || '';
+    renderUrls(file.urls||[]);
+    setStatus('Opened ' + file.name);
+  }
+  function clearEditor(showInstr=false){
+    pathEl.textContent = '/ (no file selected)';
+    editorEl.value = showInstr ? 'Select a file to edit, or create a new file.' : '';
+    titleInput.value = '';
+    tagsInput.value = '';
+    renderUrls([]);
+  }
+  function saveActiveFile(){
+    if(!activeId){ setStatus('No file selected'); return; }
+    const node = findById(workspace, activeId);
+    if(!node || node.type!=='file'){ setStatus('Cannot save: not a file'); return; }
+    node.content = editorEl.value;
+    node.title = titleInput.value.trim();
+    node.tags = tagsInput.value.trim();
+    saveWorkspace();
+    setStatus('Saved ' + node.name);
+  }
+  function downloadActiveFile(){
+    if(!activeId){ return setStatus('No file selected'); }
+    const node = findById(workspace, activeId);
+    if(!node || node.type!=='file'){ return setStatus('Select a file'); }
+    const blob = new Blob([node.content || ''], {type:'text/plain'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = node.name || 'notes.txt';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    setStatus('Downloaded ' + (node.name||'file'));
+  }
+
+  // URLs for a file
+  function renderUrls(urls){
+    urlList.innerHTML = '';
+    (urls||[]).forEach((u, idx)=>{
+      const li = document.createElement('li');
+      const a = document.createElement('a'); a.href=u; a.target='_blank'; a.rel='noopener noreferrer'; a.textContent=u;
+      const del = document.createElement('button'); del.className='btn'; del.textContent='Remove';
+      del.onclick = ()=>{
+        const file = findById(workspace, activeId);
+        if(!file || file.type!=='file') return;
+        file.urls.splice(idx,1);
+        saveWorkspace(); renderUrls(file.urls);
+      };
+      li.appendChild(a); li.appendChild(del);
+      urlList.appendChild(li);
     });
   }
-}
-
-function addFolder() {
-  const name = prompt("Enter folder name:");
-  if (name && !folders[name]) {
-    folders[name] = [];
-    buildSidebar();
+  function addUrl(){
+    if(!activeId) return alert('Open a file first');
+    const file = findById(workspace, activeId);
+    if(!file || file.type!=='file') return alert('Open a file to attach URLs');
+    const u = urlInput.value.trim();
+    if(!u) return;
+    try{ new URL(u); }catch(e){ return alert('Invalid URL'); }
+    file.urls = file.urls || [];
+    file.urls.push(u);
+    urlInput.value = '';
+    saveWorkspace(); renderUrls(file.urls);
   }
-}
 
-function saveNote() {
-  if (!currentNote) return;
-  const content = document.getElementById("editor").value;
-  localStorage.setItem(currentNote, content);
-  alert("Note saved!");
-}
+  // ===== Import/Export Workspace =====
+  function exportWorkspace(){
+    const blob = new Blob([JSON.stringify(workspace, null, 2)], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href=url; a.download='codex-jinx-workspace.json';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    setStatus('Exported workspace JSON');
+  }
+  function importWorkspace(file){
+    const reader = new FileReader();
+    reader.onload = e=>{
+      try{
+        const data = JSON.parse(e.target.result);
+        if(!data || !data.id || !data.type){ throw new Error('Invalid format'); }
+        workspace = data;
+        activeId = null; localStorage.removeItem(ACTIVE_KEY);
+        saveWorkspace(); renderTree(''); clearEditor();
+        setStatus('Imported workspace');
+      }catch(err){
+        alert('Failed to import: ' + err.message);
+      }
+    };
+    reader.readAsText(file);
+  }
 
-function loadNote(folder, file) {
-  currentNote = `${folder}/${file}`;
-  const content = localStorage.getItem(currentNote) || "";
-  document.getElementById("editor").value = content;
-}
+  // ===== File input (single file import) =====
+  function importTextFileToTree(file, parentId){
+    const parent = findById(workspace, parentId) || workspace;
+    if(parent.type!=='folder') return;
+    const reader = new FileReader();
+    reader.onload = e=>{
+      const name = file.name || 'imported.txt';
+      const node = { id: uid(), type:'file', name, title:'', tags:'', content:e.target.result, urls:[] };
+      parent.children.push(node);
+      activeId = node.id; localStorage.setItem(ACTIVE_KEY, activeId);
+      saveWorkspace(); renderTree(searchInput.value.trim()); openNode(node.id);
+    };
+    reader.readAsText(file);
+  }
 
-buildSidebar();
+  // ===== Search =====
+  searchInput.addEventListener('input', ()=>{
+    const q = searchInput.value.trim().toLowerCase();
+    renderTree(q);
+  });
+
+  // ===== Toolbar snippets =====
+  document.querySelectorAll('.btn-compact[data-snippet]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const snippet = btn.getAttribute('data-snippet');
+      const start = editorEl.selectionStart;
+      const end = editorEl.selectionEnd;
+      const val = editorEl.value;
+      editorEl.value = val.slice(0,start) + snippet + val.slice(end);
+      editorEl.selectionStart = editorEl.selectionEnd = start + snippet.length;
+      editorEl.focus();
+    });
+  });
+
+  // ===== Event bindings =====
+  newFolderBtn.onclick = ()=> createFolder(activeId || workspace.id);
+  newFileBtn.onclick   = ()=> createFile(activeId || workspace.id);
+
+  renameBtn.onclick = ()=>{
+    if(!activeId) return alert('Select an item');
+    renameNode(activeId);
+  };
+  deleteBtn.onclick = ()=>{
+    if(!activeId) return alert('Select an item');
+    deleteNode(activeId);
+  };
+
+  saveBtn.onclick = saveActiveFile;
+  downloadBtn.onclick = downloadActiveFile;
+
+  addUrlBtn.onclick = addUrl;
+
+  fileInput.onchange = (e)=>{
+    const f = e.target.files && e.target.files[0];
+    if(!f) return;
+    importTextFileToTree(f, activeId || workspace.id);
+    e.target.value = '';
+  };
+
+  importWorkspaceInput.onchange = (e)=>{
+    const f = e.target.files && e.target.files[0];
+    if(!f) return;
+    importWorkspace(f);
+    e.target.value = '';
+  };
+  exportWorkspaceBtn.onclick = exportWorkspace;
+
+  // ===== Drag & drop into sidebar =====
+  sidebar.addEventListener('dragover', (e)=>{ e.preventDefault(); sidebar.classList.add('drag-over'); });
+  sidebar.addEventListener('dragleave', ()=> sidebar.classList.remove('drag-over'));
+  sidebar.addEventListener('drop', (e)=>{
+    e.preventDefault();
+    sidebar.classList.remove('drag-over');
+    if(!e.dataTransfer?.files?.length) return;
+    const files = [...e.dataTransfer.files].filter(f=>f.type.startsWith('text') || /\.(txt|md|adoc|log|cfg|conf|ini|ps1|bat|sh|py|rb|go|js|json|ya?ml)$/i.test(f.name));
+    if(!files.length) return;
+    files.forEach(f=> importTextFileToTree(f, activeId || workspace.id));
+  });
+
+  // ===== Keyboard shortcuts =====
+  window.addEventListener('keydown', (e)=>{
+    if((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's'){
+      e.preventDefault(); saveActiveFile();
+    }
+    if((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'n'){
+      e.preventDefault(); createFile(activeId || workspace.id);
+    }
+  });
+
+  // ===== Init =====
+  renderTree('');
+  if(activeId){ openNode(activeId); } else { clearEditor(true); }
+
+})();
