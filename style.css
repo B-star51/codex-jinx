@@ -62,8 +62,7 @@ body{
   width:100%; padding:8px 10px; border-radius:10px;
   border:1px solid var(--border); background:#0c1222; color:var(--text);
 }
-.sidebar-hint{font-size:12px; color:var(--muted); padding:8px 10px; border-top:1px dashed var(--border)}
-.tree{list-style:none; margin:0; padding:6px 6px 12px 6px; overflow:auto; flex:1}
+.tree{list-style:none; margin:0; padding:6px; overflow:auto; flex:1}
 .tree li{
   display:flex; align-items:center; gap:8px;
   padding:6px 8px; border-radius:8px; cursor:pointer; user-select:none;
@@ -71,66 +70,22 @@ body{
 .tree li:hover{background:rgba(255,255,255,.03)}
 .tree li.active{background:rgba(0,255,213,.12); outline:1px solid rgba(0,255,213,.3)}
 .node-label{flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:var(--text)}
-.node-type{font-size:12px; color:var(--muted)}
-.node-actions{display:none; gap:6px}
-.tree li:hover .node-actions{display:flex}
-.node-actions button{font-size:12px; padding:4px 6px}
 
 .editor-pane{display:flex; flex-direction:column; min-width:0}
 .editor-bar{
   display:flex; align-items:center; justify-content:space-between;
   padding:10px 12px; border-bottom:1px solid var(--border); background:var(--panel-2);
 }
-.path{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, "Liberation Mono", Consolas, monospace; color:var(--muted)}
-.sep{width:1px; height:18px; background:var(--border); margin:0 6px}
-
-.meta{
-  display:grid; grid-template-columns:1fr 1fr; gap:10px; padding:10px 12px; background:#0c1222; border-bottom:1px solid var(--border);
-}
-.meta-group{display:flex; flex-direction:column; gap:6px}
-.meta input{
-  padding:8px; border-radius:8px; border:1px solid var(--border); background:#091224; color:var(--text);
-}
-
-.toolbar{
-  display:flex; gap:6px; padding:8px 12px; background:var(--panel);
-  border-bottom:1px solid var(--border);
-}
-.btn-compact{
-  padding:6px 8px; background:#0c1222; border:1px solid var(--border); color:var(--text);
-  border-radius:8px; cursor:pointer;
-}
-.btn-compact:hover{background:#0f1424}
+.path{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; color:var(--muted)}
 
 #editor{
   flex:1; width:100%; border:0; outline:none; resize:none; padding:14px 16px;
   background:transparent; color:var(--text);
-  font:13px/1.5 ui-monospace, SFMono-Regular, Menlo, Monaco, "Liberation Mono", Consolas, monospace;
+  font:13px/1.5 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
-
-.links{border-top:1px solid var(--border); background:var(--panel); padding:10px 12px}
-.links-head{display:flex; align-items:center; justify-content:space-between; gap:10px}
-.links-actions{display:flex; gap:8px}
-#urlInput{
-  min-width:320px; flex:1; padding:8px; border-radius:8px; border:1px solid var(--border); background:#0c1222; color:var(--text);
-}
-.url-list{list-style:none; margin:8px 0 0; padding:0; display:grid; gap:6px}
-.url-list li{display:flex; align-items:center; justify-content:space-between; gap:10px; background:#0c1222; border:1px solid var(--border); border-radius:8px; padding:8px 10px}
-.url-list a{color:var(--acc)}
-.url-list button{padding:4px 6px}
 
 .app-footer{
   padding:8px 12px; border-top:1px solid var(--border); color:var(--muted);
   background:var(--panel); font-size:12px;
-}
-
-/* Drag and drop cue */
-.sidebar.drag-over{outline:2px dashed var(--acc); outline-offset:-6px}
-
-/* Responsive */
-@media (max-width: 960px){
-  .layout{grid-template-columns:1fr}
-  .sidebar{height:40vh; border-right:none; border-bottom:1px solid var(--border)}
-  .editor-pane{height:calc(60vh - 0px)}
 }
 
