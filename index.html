@@ -1,41 +1,54 @@
-// DOM Elements
-const editor = document.getElementById('editor');
-const fileInput = document.getElementById('fileInput');
-const saveBtn = document.getElementById('saveBtn');
-const downloadBtn = document.getElementById('downloadBtn');
-const status = document.getElementById('status');
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cybersecurity Playbook Editor</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="app-header">
+    <div class="logo">
+      <!-- Random symbol logo -->
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2L15 8H9L12 2Z" fill="#00ffd5"/>
+        <circle cx="12" cy="14" r="4" stroke="#7b2cff" stroke-width="2"/>
+      </svg>
+      <span>Cyber Playbook</span>
+    </div>
+    <div class="header-actions">
+      <button class="btn" id="addFileBtn">Add File</button>
+      <button class="btn" id="addFolderBtn">Add Folder</button>
+      <label class="btn btn-file">
+        Upload
+        <input type="file" id="uploadInput" multiple>
+      </label>
+      <button class="btn primary" id="saveBtn">Save</button>
+    </div>
+  </header>
 
-// --- FILE IMPORT / UPLOAD ---
-fileInput.addEventListener('change', (event) => {
-  const file = event.target.files[0];
-  if (!file) return;
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="sidebar-top">
+        <input type="text" class="search" placeholder="Search files...">
+      </div>
+      <ul class="tree" id="fileTree"></ul>
+    </aside>
 
-  const reader = new FileReader();
-  reader.onload = e => {
-    editor.value = e.target.result; // textarea uses .value
-    status.textContent = `Loaded: ${file.name}`;
-  };
-  reader.readAsText(file);
-});
+    <div class="editor-pane">
+      <div class="editor-bar">
+        <span class="path" id="currentPath">No file selected</span>
+      </div>
+      <textarea id="editor" placeholder="Start writing your cybersecurity notes..."></textarea>
+    </div>
+  </div>
 
-// --- SAVE CURRENT TEXT LOCALLY ---
-saveBtn.addEventListener('click', () => {
-  // Here you could also integrate saving to an in-browser workspace.
-  // For now, mark status as saved:
-  status.textContent = 'Changes saved to workspace (in-memory).';
-});
+  <footer class="app-footer">
+    Cybersecurity Playbook Editor - Data saved locally
+  </footer>
 
-// --- DOWNLOAD CURRENT TEXT AS FILE ---
-downloadBtn.addEventListener('click', () => {
-  const text = editor.value;
-  const blob = new Blob([text], { type: 'text/plain' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'playbook.txt'; // Or dynamic name if needed
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-  status.textContent = 'Downloaded current file.';
-});
+  <!-- Hidden inputs for folder upload -->
+  <input type="file" id="folderInput" style="display:none;" webkitdirectory directory multiple>
+  <script src="script.js"></script>
+</body>
+</html>
