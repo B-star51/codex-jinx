@@ -48,11 +48,17 @@ header {
   border-bottom: 1px solid #00ffff;
 }
 
+header img {
+  height: 40px;
+  margin-right: 10px;
+}
+
 aside {
   width: 250px;
   background: #0d254f;
   padding: 20px;
   border-right: 1px solid #00ffff;
+  overflow-y: auto;
 }
 
 aside ul {
@@ -64,10 +70,14 @@ aside li {
   margin: 10px 0;
   cursor: pointer;
   color: #00ffff;
+  font-size: 14px;
 }
 
 main {
   flex-grow: 1;
   padding: 20px;
   overflow-y: auto;
+  color: #ffffff;
+  font-size: 16px;
+  line-height: 1.6;
 }
