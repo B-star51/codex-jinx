@@ -1,0 +1,73 @@
+body {
+  margin: 0;
+  font-family: 'Fira Code', monospace;
+  background-color: #0a1f44;
+  color: white;
+  overflow: hidden;
+}
+
+#matrix {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 0;
+}
+
+#intro {
+  position: absolute;
+  top: 40%; left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 1;
+}
+
+.quote {
+  font-style: italic;
+  margin-top: 10px;
+  color: #00ffff;
+}
+
+.hidden {
+  display: none;
+}
+
+#dashboard {
+  display: flex;
+  height: 100vh;
+  z-index: 2;
+}
+
+header {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  background: #0a1f44;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #00ffff;
+}
+
+aside {
+  width: 250px;
+  background: #0d254f;
+  padding: 20px;
+  border-right: 1px solid #00ffff;
+}
+
+aside ul {
+  list-style: none;
+  padding: 0;
+}
+
+aside li {
+  margin: 10px 0;
+  cursor: pointer;
+  color: #00ffff;
+}
+
+main {
+  flex-grow: 1;
+  padding: 20px;
+  overflow-y: auto;
+}

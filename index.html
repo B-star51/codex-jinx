@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Codex-Jinx</title>
+  <link rel="stylesheet" href="style.css" />
+  <script defer src="script.js"></script>
+</head>
+<body>
+  <canvas id="matrix"></canvas>
+  <div id="intro">
+    <h1>Codex-Jinx</h1>
+    <p class="quote">“The quieter you become, the more you are able to hear.”</p>
+  </div>
+
+  <div id="dashboard" class="hidden">
+    <header>
+      <img src="assets/logo.png" alt="Codex-Jinx Logo" />
+      <h2>Codex-Jinx</h2>
+    </header>
+    <aside>
+      <ul>
+        <li onclick="loadNote('notes/network/nmap.md')">📁 Network > Nmap</li>
+        <li onclick="loadNote('notes/web/burpsuite.md')">📁 Web > BurpSuite</li>
+      </ul>
+    </aside>
+    <main id="note-viewer">
+      <p>Select a note to begin.</p>
+    </main>
+  </div>
+</body>
+</html>
