@@ -8,7 +8,7 @@
 </head>
 <body>
   <header class="app-header">
-    <!-- Random symbolic logo (cyber shield + keyhole) -->
+    <!-- Logo (cyber shield + keyhole) -->
     <div class="logo" aria-label="Codex Jinx Logo" title="Codex Jinx">
       <svg viewBox="0 0 64 64" role="img" aria-hidden="true">
         <defs>
@@ -17,9 +17,7 @@
             <stop offset="1" stop-color="#7b2cff"/>
           </linearGradient>
         </defs>
-        <!-- Shield -->
         <path d="M32 4l20 8v16c0 12.5-8.5 23.9-20 28-11.5-4.1-20-15.5-20-28V12l20-8z" fill="url(#g)" stroke="#0b0f1a" stroke-width="2"/>
-        <!-- Keyhole -->
         <circle cx="32" cy="28" r="8" fill="#0b0f1a"/>
         <rect x="30" y="32" width="4" height="10" rx="2" fill="#0b0f1a"/>
       </svg>
@@ -27,16 +25,16 @@
     </div>
 
     <div class="header-actions">
-      <button id="newFolderBtn" class="btn">New Folder</button>
-      <button id="newFileBtn" class="btn">New File</button>
-      <label class="btn btn-file">
+      <button id="newFolderBtn" class="btn" type="button">New Folder</button>
+      <button id="newFileBtn" class="btn" type="button">New File</button>
+      <label class="btn btn-file" for="fileInput">
         Import File
-        <input id="fileInput" type="file" accept=".txt,.md,.adoc,.json,.log,.cfg,.conf,.ini,.ps1,.bat,.sh,.py,.rb,.go,.js,.yaml,.yml" />
+        <input id="fileInput" type="file" accept=".txt,.md,.adoc,.json,.log,.cfg,.conf,.ini,.ps1,.bat,.sh,.py,.rb,.go,.js,.yaml,.yml" style="display:none;" />
       </label>
-      <button id="exportWorkspaceBtn" class="btn">Export Workspace</button>
-      <label class="btn btn-file">
+      <button id="exportWorkspaceBtn" class="btn" type="button">Export Workspace</button>
+      <label class="btn btn-file" for="importWorkspaceInput">
         Import Workspace
-        <input id="importWorkspaceInput" type="file" accept=".json" />
+        <input id="importWorkspaceInput" type="file" accept=".json" style="display:none;" />
       </label>
     </div>
   </header>
@@ -44,7 +42,7 @@
   <main class="layout">
     <aside class="sidebar" id="sidebar" aria-label="Playbook Tree" tabindex="0">
       <div class="sidebar-top">
-        <input id="searchInput" class="search" type="search" placeholder="Search files…" />
+        <input id="searchInput" class="search" type="search" placeholder="Search files…" autocomplete="off" />
       </div>
       <ul id="tree" class="tree" aria-live="polite"></ul>
       <div class="sidebar-hint">
@@ -56,30 +54,30 @@
       <div class="editor-bar">
         <div class="path" id="currentPath">/ (no file selected)</div>
         <div class="editor-actions">
-          <button id="renameBtn" class="btn btn-ghost" title="Rename">Rename</button>
-          <button id="deleteBtn" class="btn btn-ghost" title="Delete">Delete</button>
+          <button id="renameBtn" class="btn btn-ghost" type="button" title="Rename">Rename</button>
+          <button id="deleteBtn" class="btn btn-ghost" type="button" title="Delete">Delete</button>
           <span class="sep"></span>
-          <button id="downloadBtn" class="btn" title="Download current file">Download</button>
-          <button id="saveBtn" class="btn primary" title="Save to workspace">Save</button>
+          <button id="downloadBtn" class="btn" type="button" title="Download current file">Download</button>
+          <button id="saveBtn" class="btn primary" type="button" title="Save to workspace">Save</button>
         </div>
       </div>
 
       <div class="meta">
         <div class="meta-group">
           <label for="titleInput">Title</label>
-          <input id="titleInput" type="text" placeholder="File title (optional)" />
+          <input id="titleInput" type="text" placeholder="File title (optional)" autocomplete="off" />
         </div>
         <div class="meta-group">
           <label for="tagsInput">Tags</label>
-          <input id="tagsInput" type="text" placeholder="comma, separated, tags" />
+          <input id="tagsInput" type="text" placeholder="comma, separated, tags" autocomplete="off" />
         </div>
       </div>
 
-      <div class="toolbar">
-        <button class="btn-compact" data-snippet="# Command\n" title="Add command block">cmd</button>
-        <button class="btn-compact" data-snippet="## Step\n" title="Add step heading">H2</button>
-        <button class="btn-compact" data-snippet="- [ ] TODO\n" title="Add TODO">TODO</button>
-        <button class="btn-compact" data-snippet="\n---\n" title="Add divider">—</button>
+      <div class="toolbar" aria-label="Editor Toolbar">
+        <button class="btn-compact" type="button" data-snippet="# Command\n" title="Add command block" aria-label="Add command block">cmd</button>
+        <button class="btn-compact" type="button" data-snippet="## Step\n" title="Add step heading" aria-label="Add step heading">H2</button>
+        <button class="btn-compact" type="button" data-snippet="- [ ] TODO\n" title="Add TODO" aria-label="Add TODO">TODO</button>
+        <button class="btn-compact" type="button" data-snippet="\n---\n" title="Add divider" aria-label="Add divider">—</button>
       </div>
 
       <textarea id="editor" spellcheck="false" placeholder="Write your playbook notes here… (supports any plain text/markdown/config/script)"></textarea>
@@ -88,8 +86,8 @@
         <div class="links-head">
           <h3>Related URLs</h3>
           <div class="links-actions">
-            <input id="urlInput" type="url" placeholder="https://reference.example" />
-            <button id="addUrlBtn" class="btn">Add URL</button>
+            <input id="urlInput" type="url" placeholder="https://reference.example" autocomplete="off" />
+            <button id="addUrlBtn" class="btn" type="button">Add URL</button>
           </div>
         </div>
         <ul id="urlList" class="url-list"></ul>
