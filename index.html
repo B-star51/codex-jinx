@@ -41,4 +41,67 @@
     </div>
   </header>
 
-  <main c
+  <main class="layout">
+    <aside class="sidebar" id="sidebar" aria-label="Playbook Tree" tabindex="0">
+      <div class="sidebar-top">
+        <input id="searchInput" class="search" type="search" placeholder="Search files…" />
+      </div>
+      <ul id="tree" class="tree" aria-live="polite"></ul>
+      <div class="sidebar-hint">
+        Tip: drag & drop text files here to add them.
+      </div>
+    </aside>
+
+    <section class="editor-pane">
+      <div class="editor-bar">
+        <div class="path" id="currentPath">/ (no file selected)</div>
+        <div class="editor-actions">
+          <button id="renameBtn" class="btn btn-ghost" title="Rename">Rename</button>
+          <button id="deleteBtn" class="btn btn-ghost" title="Delete">Delete</button>
+          <span class="sep"></span>
+          <button id="downloadBtn" class="btn" title="Download current file">Download</button>
+          <button id="saveBtn" class="btn primary" title="Save to workspace">Save</button>
+        </div>
+      </div>
+
+      <div class="meta">
+        <div class="meta-group">
+          <label for="titleInput">Title</label>
+          <input id="titleInput" type="text" placeholder="File title (optional)" />
+        </div>
+        <div class="meta-group">
+          <label for="tagsInput">Tags</label>
+          <input id="tagsInput" type="text" placeholder="comma, separated, tags" />
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <button class="btn-compact" data-snippet="# Command\n" title="Add command block">cmd</button>
+        <button class="btn-compact" data-snippet="## Step\n" title="Add step heading">H2</button>
+        <button class="btn-compact" data-snippet="- [ ] TODO\n" title="Add TODO">TODO</button>
+        <button class="btn-compact" data-snippet="\n---\n" title="Add divider">—</button>
+      </div>
+
+      <textarea id="editor" spellcheck="false" placeholder="Write your playbook notes here… (supports any plain text/markdown/config/script)"></textarea>
+
+      <div class="links">
+        <div class="links-head">
+          <h3>Related URLs</h3>
+          <div class="links-actions">
+            <input id="urlInput" type="url" placeholder="https://reference.example" />
+            <button id="addUrlBtn" class="btn">Add URL</button>
+          </div>
+        </div>
+        <ul id="urlList" class="url-list"></ul>
+      </div>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <span id="status">Ready.</span>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
+
