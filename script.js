@@ -1,7 +1,7 @@
 // ====== Codex Jinx — Cyber Playbook Workspace ======
 // Structure persisted to localStorage:
 // { id, type:'folder'|'file', name, children?, content?, title?, tags?, urls?:string[] }
-(function(){
+document.addEventListener('DOMContentLoaded', function() {
   const STORAGE_KEY = 'codexJinxWorkspace';
   const ACTIVE_KEY  = 'codexJinxActiveId';
 
@@ -111,10 +111,11 @@ Welcome! Start building your playbook.
     const p = parts[0] || [workspace.name];
     return '/' + p.join('/');
   }
-  function setStatus(msg){ statusEl.textContent = msg + ' • ' + now() }
+  function setStatus(msg){ if(statusEl) statusEl.textContent = msg + ' • ' + now(); }
 
   // ===== Tree rendering =====
   function renderTree(filter=''){
+    if(!treeEl) return;
     treeEl.innerHTML = '';
     function renderNode(node, ul){
       const li = document.createElement('li');
@@ -146,7 +147,7 @@ Welcome! Start building your playbook.
         activeId = node.id;
         localStorage.setItem(ACTIVE_KEY, activeId);
         openNode(node.id);
-        renderTree(searchInput.value.trim());
+        renderTree(searchInput && searchInput.value ? searchInput.value.trim() : '');
       };
 
       if(!filter || node.name.toLowerCase().includes(filter)){
@@ -172,7 +173,7 @@ Welcome! Start building your playbook.
     const parent = findById(workspace, parentId) || workspace;
     if(parent.type !== 'folder') return;
     parent.children.push({ id: uid(), type: 'folder', name: 'New Folder', children: [] });
-    saveWorkspace(); renderTree(searchInput.value.trim());
+    saveWorkspace(); renderTree(searchInput && searchInput.value ? searchInput.value.trim() : '');
   }
   function createFile(parentId){
     const parent = findById(workspace, parentId) || workspace;
@@ -181,7 +182,7 @@ Welcome! Start building your playbook.
     parent.children.push(file);
     activeId = file.id;
     localStorage.setItem(ACTIVE_KEY, activeId);
-    saveWorkspace(); renderTree(searchInput.value.trim()); openNode(file.id);
+    saveWorkspace(); renderTree(searchInput && searchInput.value ? searchInput.value.trim() : ''); openNode(file.id);
   }
   function renameNode(id){
     const node = findById(workspace, id);
@@ -189,7 +190,7 @@ Welcome! Start building your playbook.
     const name = prompt('Rename to:', node.name);
     if(!name) return;
     node.name = name.trim();
-    saveWorkspace(); renderTree(searchInput.value.trim()); if(id===activeId) refreshEditor(node);
+    saveWorkspace(); renderTree(searchInput && searchInput.value ? searchInput.value.trim() : ''); if(id===activeId) refreshEditor(node);
   }
   function deleteNode(id){
     if(workspace.id === id) return alert('Cannot delete root');
@@ -198,7 +199,7 @@ Welcome! Start building your playbook.
     if(!confirm('Delete this item?')) return;
     parent.children = parent.children.filter(c=>c.id!==id);
     if(activeId === id){ activeId = null; localStorage.removeItem(ACTIVE_KEY); clearEditor(); }
-    saveWorkspace(); renderTree(searchInput.value.trim());
+    saveWorkspace(); renderTree(searchInput && searchInput.value ? searchInput.value.trim() : '');
   }
 
   // ===== Editor handling =====
@@ -206,34 +207,34 @@ Welcome! Start building your playbook.
     const node = findById(workspace, id);
     if(!node) return;
     if(node.type === 'folder'){
-      pathEl.textContent = pathOf(node.id) + ' (folder)';
+      if(pathEl) pathEl.textContent = pathOf(node.id) + ' (folder)';
       clearEditor(true);
       return;
     }
     refreshEditor(node);
   }
   function refreshEditor(file){
-    pathEl.textContent = pathOf(file.id);
-    editorEl.value = file.content || '';
-    titleInput.value = file.title || '';
-    tagsInput.value = file.tags || '';
+    if(pathEl) pathEl.textContent = pathOf(file.id);
+    if(editorEl) editorEl.value = file.content || '';
+    if(titleInput) titleInput.value = file.title || '';
+    if(tagsInput) tagsInput.value = file.tags || '';
     renderUrls(file.urls||[]);
     setStatus('Opened ' + file.name);
   }
   function clearEditor(showInstr=false){
-    pathEl.textContent = '/ (no file selected)';
-    editorEl.value = showInstr ? 'Select a file to edit, or create a new file.' : '';
-    titleInput.value = '';
-    tagsInput.value = '';
+    if(pathEl) pathEl.textContent = '/ (no file selected)';
+    if(editorEl) editorEl.value = showInstr ? 'Select a file to edit, or create a new file.' : '';
+    if(titleInput) titleInput.value = '';
+    if(tagsInput) tagsInput.value = '';
     renderUrls([]);
   }
   function saveActiveFile(){
     if(!activeId){ setStatus('No file selected'); return; }
     const node = findById(workspace, activeId);
     if(!node || node.type!=='file'){ setStatus('Cannot save: not a file'); return; }
-    node.content = editorEl.value;
-    node.title = titleInput.value.trim();
-    node.tags = tagsInput.value.trim();
+    node.content = editorEl ? editorEl.value : '';
+    node.title = titleInput ? titleInput.value.trim() : '';
+    node.tags = tagsInput ? tagsInput.value.trim() : '';
     saveWorkspace();
     setStatus('Saved ' + node.name);
   }
@@ -252,6 +253,7 @@ Welcome! Start building your playbook.
 
   // URLs for a file
   function renderUrls(urls){
+    if(!urlList) return;
     urlList.innerHTML = '';
     (urls||[]).forEach((u, idx)=>{
       const li = document.createElement('li');
@@ -271,12 +273,12 @@ Welcome! Start building your playbook.
     if(!activeId) return alert('Open a file first');
     const file = findById(workspace, activeId);
     if(!file || file.type!=='file') return alert('Open a file to attach URLs');
-    const u = urlInput.value.trim();
+    const u = urlInput && urlInput.value ? urlInput.value.trim() : '';
     if(!u) return;
     try{ new URL(u); }catch(e){ return alert('Invalid URL'); }
     file.urls = file.urls || [];
     file.urls.push(u);
-    urlInput.value = '';
+    if(urlInput) urlInput.value = '';
     saveWorkspace(); renderUrls(file.urls);
   }
 
@@ -316,21 +318,24 @@ Welcome! Start building your playbook.
       const node = { id: uid(), type:'file', name, title:'', tags:'', content:e.target.result, urls:[] };
       parent.children.push(node);
       activeId = node.id; localStorage.setItem(ACTIVE_KEY, activeId);
-      saveWorkspace(); renderTree(searchInput.value.trim()); openNode(node.id);
+      saveWorkspace(); renderTree(searchInput && searchInput.value ? searchInput.value.trim() : ''); openNode(node.id);
     };
     reader.readAsText(file);
   }
 
   // ===== Search =====
-  searchInput.addEventListener('input', ()=>{
-    const q = searchInput.value.trim().toLowerCase();
-    renderTree(q);
-  });
+  if(searchInput) {
+    searchInput.addEventListener('input', ()=>{
+      const q = searchInput.value.trim().toLowerCase();
+      renderTree(q);
+    });
+  }
 
   // ===== Toolbar snippets =====
   document.querySelectorAll('.btn-compact[data-snippet]').forEach(btn=>{
     btn.addEventListener('click', ()=>{
       const snippet = btn.getAttribute('data-snippet');
+      if(!editorEl) return;
       const start = editorEl.selectionStart;
       const end = editorEl.selectionEnd;
       const val = editorEl.value;
@@ -341,49 +346,51 @@ Welcome! Start building your playbook.
   });
 
   // ===== Event bindings =====
-  newFolderBtn.onclick = ()=> createFolder(activeId || workspace.id);
-  newFileBtn.onclick   = ()=> createFile(activeId || workspace.id);
+  if(newFolderBtn) newFolderBtn.onclick = ()=> createFolder(activeId || workspace.id);
+  if(newFileBtn) newFileBtn.onclick   = ()=> createFile(activeId || workspace.id);
 
-  renameBtn.onclick = ()=>{
+  if(renameBtn) renameBtn.onclick = ()=>{
     if(!activeId) return alert('Select an item');
     renameNode(activeId);
   };
-  deleteBtn.onclick = ()=>{
+  if(deleteBtn) deleteBtn.onclick = ()=>{
     if(!activeId) return alert('Select an item');
     deleteNode(activeId);
   };
 
-  saveBtn.onclick = saveActiveFile;
-  downloadBtn.onclick = downloadActiveFile;
+  if(saveBtn) saveBtn.onclick = saveActiveFile;
+  if(downloadBtn) downloadBtn.onclick = downloadActiveFile;
 
-  addUrlBtn.onclick = addUrl;
+  if(addUrlBtn) addUrlBtn.onclick = addUrl;
 
-  fileInput.onchange = (e)=>{
+  if(fileInput) fileInput.onchange = (e)=>{
     const f = e.target.files && e.target.files[0];
     if(!f) return;
     importTextFileToTree(f, activeId || workspace.id);
     e.target.value = '';
   };
 
-  importWorkspaceInput.onchange = (e)=>{
+  if(importWorkspaceInput) importWorkspaceInput.onchange = (e)=>{
     const f = e.target.files && e.target.files[0];
     if(!f) return;
     importWorkspace(f);
     e.target.value = '';
   };
-  exportWorkspaceBtn.onclick = exportWorkspace;
+  if(exportWorkspaceBtn) exportWorkspaceBtn.onclick = exportWorkspace;
 
   // ===== Drag & drop into sidebar =====
-  sidebar.addEventListener('dragover', (e)=>{ e.preventDefault(); sidebar.classList.add('drag-over'); });
-  sidebar.addEventListener('dragleave', ()=> sidebar.classList.remove('drag-over'));
-  sidebar.addEventListener('drop', (e)=>{
-    e.preventDefault();
-    sidebar.classList.remove('drag-over');
-    if(!e.dataTransfer?.files?.length) return;
-    const files = [...e.dataTransfer.files].filter(f=>f.type.startsWith('text') || /\.(txt|md|adoc|log|cfg|conf|ini|ps1|bat|sh|py|rb|go|js|json|ya?ml)$/i.test(f.name));
-    if(!files.length) return;
-    files.forEach(f=> importTextFileToTree(f, activeId || workspace.id));
-  });
+  if(sidebar) {
+    sidebar.addEventListener('dragover', (e)=>{ e.preventDefault(); sidebar.classList.add('drag-over'); });
+    sidebar.addEventListener('dragleave', ()=> sidebar.classList.remove('drag-over'));
+    sidebar.addEventListener('drop', (e)=>{
+      e.preventDefault();
+      sidebar.classList.remove('drag-over');
+      if(!e.dataTransfer?.files?.length) return;
+      const files = [...e.dataTransfer.files].filter(f=>f.type.startsWith('text') || /\.(txt|md|adoc|log|cfg|conf|ini|ps1|bat|sh|py|rb|go|js|json|ya?ml)$/i.test(f.name));
+      if(!files.length) return;
+      files.forEach(f=> importTextFileToTree(f, activeId || workspace.id));
+    });
+  }
 
   // ===== Keyboard shortcuts =====
   window.addEventListener('keydown', (e)=>{
@@ -399,5 +406,5 @@ Welcome! Start building your playbook.
   renderTree('');
   if(activeId){ openNode(activeId); } else { clearEditor(true); }
 
-})();
+});
 
